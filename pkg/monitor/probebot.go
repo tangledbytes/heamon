@@ -34,7 +34,7 @@ func NewProbeBot(eb *eventbus.EventBus, interval int, name, host, endpoint strin
 
 // Start the probbot
 func (p *ProbeBot) Start() {
-	ticker := time.NewTicker(time.Duration(p.interval) * time.Second)
+	ticker := time.NewTicker(time.Duration(p.interval) * time.Minute)
 
 	p.eb.Subscribe("prober.probebot.cancel", func(data ...interface{}) {
 		logrus.Info("received cancellation for", p.name)
