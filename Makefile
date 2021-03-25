@@ -10,7 +10,7 @@ run-ui:
 build: build-server build-ui
 
 build-server:
-	go build -ldflags="-w -s -X main.version=${GIT_VERSION} -X main.commitsha=${GIT_COMMITSHA}" -a -o heamon
+	go build -ldflags="-w -s -X main.version=${GIT_VERSION} -X main.commit=${GIT_COMMITSHA}" -a -o heamon
 
 build-ui:
 	cd ui && npm run build
