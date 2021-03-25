@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/spf13/viper"
 	"github.com/utkarsh-pro/heamon/models"
-	"github.com/utkarsh-pro/heamon/pkg/utils"
 )
 
 // NewRoutes registers the REST endpoints to the fiber app
@@ -14,7 +14,7 @@ func NewRoutes(app *fiber.App, handlers models.Handler) {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{
-			"Title": utils.GetEnv("APP_NAME", "Heamon"),
+			"Title": viper.GetString("TITLE"),
 		})
 	})
 	app.Static("/", "./ui/build")

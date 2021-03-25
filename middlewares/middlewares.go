@@ -5,7 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/utkarsh-pro/heamon/pkg/utils"
+	"github.com/spf13/viper"
 )
 
 // Setup sets up some default middlewares
@@ -16,7 +16,7 @@ func Setup(app *fiber.App) {
 		Routes: Routes{"/api/v1/config"},
 		Config: basicauth.Config{
 			Users: map[string]string{
-				utils.GetEnv("HEAMON_USER", "admin"): utils.GetEnv("HEAMON_PASS", "pl,pl,"),
+				viper.GetString("HEAMON_USER"): viper.GetString("HEAMON_PASS"),
 			},
 		},
 	}))

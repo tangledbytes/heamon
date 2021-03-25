@@ -9,15 +9,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"github.com/utkarsh-pro/heamon/handlers"
 	"github.com/utkarsh-pro/heamon/middlewares"
 	"github.com/utkarsh-pro/heamon/models"
+	"github.com/utkarsh-pro/heamon/pkg/config"
 	"github.com/utkarsh-pro/heamon/pkg/monitor"
-	"github.com/utkarsh-pro/heamon/pkg/utils"
 	"github.com/utkarsh-pro/heamon/routes"
 )
-
-const defaultPort = "5000"
 
 var (
 	uiDirectory = filepath.Join(".", "ui", "build")
@@ -28,6 +27,8 @@ var (
 
 func main() {
 	printInfo(version, commit, date)
+
+	config.Setup()
 
 	// Setup the rendering engine as there are some overrides
 	// that heamon offers react based frontend
@@ -46,12 +47,16 @@ func main() {
 
 	routes.NewRoutes(app, handlers)
 
-	// Handle graceful shutdown
-	go gracefulShutdown(app)
+	go func() {
+		if err := app.Listen(":" + viper.GetString("PORT")); err != nil {
+			logrus.Error(err)
+		}
+	}()
 
-	if err := app.Listen(":" + utils.GetEnv("PORT", defaultPort)); err != nil {
-		logrus.Error(err)
-	}
+	fmt.Println("🚀 Heamon started on PORT: ", viper.GetString("PORT"))
+
+	// Handle graceful shutdown
+	gracefulShutdown(app)
 }
 
 func gracefulShutdown(app *fiber.App) {
