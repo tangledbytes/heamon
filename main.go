@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/template/html"
 	"github.com/sirupsen/logrus"
 	"github.com/utkarsh-pro/heamon/handlers"
+	"github.com/utkarsh-pro/heamon/middlewares"
 	"github.com/utkarsh-pro/heamon/models"
 	"github.com/utkarsh-pro/heamon/pkg/monitor"
 	"github.com/utkarsh-pro/heamon/pkg/utils"
@@ -31,7 +32,13 @@ func main() {
 	// Setup the rendering engine as there are some overrides
 	// that heamon offers react based frontend
 	engine := html.New(uiDirectory, ".html")
-	app := fiber.New(fiber.Config{Views: engine})
+	app := fiber.New(fiber.Config{
+		Views:                 engine,
+		DisableStartupMessage: true,
+	})
+
+	// Setup middlewares
+	middlewares.Setup(app)
 
 	// Setup monitoring on top of the http endpoints
 	mon := monitor.New(models.Config{Interval: 1})
@@ -39,6 +46,7 @@ func main() {
 
 	routes.NewRoutes(app, handlers)
 
+	// Handle graceful shutdown
 	go gracefulShutdown(app)
 
 	if err := app.Listen(":" + utils.GetEnv("PORT", defaultPort)); err != nil {
