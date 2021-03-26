@@ -3,4 +3,5 @@
 node_modules
 heamon
 .vscode
+config.yaml
 dist/

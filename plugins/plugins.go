@@ -7,15 +7,15 @@ import (
 	"github.com/utkarsh-pro/heamon/plugins/alerts"
 )
 
-func Setup(cfg *models.PluginsAlerts) {
-	if cfg.Email != nil {
+func Setup(cfg *models.Plugins) {
+	if cfg.Alert.Email != nil {
 		mail := alerts.NewMail(
-			cfg.Email.SMTP.Host,
-			cfg.Email.SMTP.Port,
-			cfg.Email.SMTP.Password,
-			cfg.Email.SMTP.Username,
-			cfg.Email.From,
-			cfg.Email.To,
+			cfg.Alert.Email.SMTP.Host,
+			cfg.Alert.Email.SMTP.Port,
+			cfg.Alert.Email.SMTP.Password,
+			cfg.Alert.Email.SMTP.Username,
+			cfg.Alert.Email.From,
+			cfg.Alert.Email.To,
 		)
 
 		eventbus.Bus.Subscribe(mail.GetEvent(), func(data ...interface{}) {

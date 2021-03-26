@@ -31,7 +31,7 @@ func main() {
 	cfg := config.Setup()
 
 	// Plugins setup
-	plugins.Setup(cfg.Plugins.Alert)
+	plugins.Setup(cfg.Plugins)
 
 	// Setup the rendering engine as there are some overrides
 	// that heamon offers react based frontend
