@@ -15,13 +15,6 @@ type Monitor struct {
 	Prober *Prober
 }
 
-// SetupSubscribers sets up all of the
-// initial subscribers
-func (m *Monitor) SetupSubscribers() {
-	// Setup subscriber for config updates
-	m.setupConfigUpdateSubscribers()
-}
-
 // New returns a pointer to an instance of the monitor
 func New(storeManager *store.Manager) *Monitor {
 	st := storeManager.Status()
@@ -41,7 +34,9 @@ func New(storeManager *store.Manager) *Monitor {
 	return mon
 }
 
-func (m *Monitor) setupConfigUpdateSubscribers() {
+// SetupSubscribers sets up all of the
+// initial subscribers
+func (m *Monitor) SetupSubscribers() {
 	m.Config.Watch(config.UPDATE, func() {
 		if m.Prober != nil {
 			// Terminate old prober

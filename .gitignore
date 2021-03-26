@@ -5,3 +5,4 @@ heamon
 .vscode
 config.yaml
 dist/
+pkg/entrypoint/rest/ui

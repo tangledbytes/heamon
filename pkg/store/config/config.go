@@ -73,6 +73,7 @@ func New() *Config {
 		hook: &Hook{
 			Update: hook.New(),
 		},
+		eb: eventbus.New(),
 	}
 }
 
