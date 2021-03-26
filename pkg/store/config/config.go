@@ -99,11 +99,12 @@ func (cfg *Config) Update(configbyt []byte) error {
 		return fmt.Errorf("invalid format of the configuration")
 	}
 
-	// Fire the event
-	cfg.eb.Publish(string(UPDATE))
-
 	// Execute the update hook
 	cfg.Hook().Update.Execute()
+
+	// Fire the event THIS SHOULD HAPPEN ONLY
+	// ONCE ALL OF THE HOOKS ARE COMPLETED
+	cfg.eb.Publish(string(UPDATE))
 
 	return nil
 }

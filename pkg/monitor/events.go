@@ -1,7 +1,7 @@
 package monitor
 
+type Event string
+
 const (
-	ConfigUpdate = "haemon.config.update"
-	StatusUpdate = "haemon.status.update"
-	PluginAlert  = "heamon.plugin.alert"
+	TerminateProbeBot Event = "heamon.monitor.prober.probebot.terminate"
 )

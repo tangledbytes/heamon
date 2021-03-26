@@ -1,36 +1,38 @@
 package monitor
 
 import (
-	"fmt"
 	"net/http"
 	"path"
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/utkarsh-pro/heamon/models"
 	"github.com/utkarsh-pro/heamon/pkg/eventbus"
+	"github.com/utkarsh-pro/heamon/pkg/store/status"
 )
 
 type ProbeBot struct {
-	name        string
-	host        string
-	endpoint    string
-	interval    int
-	tolerance   float64
-	averageOver int
+	name       string
+	host       string
+	endpoint   string
+	interval   int
+	sendUpdate func(service string, status status.HealthStatus)
 
 	eb *eventbus.EventBus
 }
 
 // NewProbeBot returns a pointer to an instance of ProbBot
-func NewProbeBot(eb *eventbus.EventBus, interval int, name, host, endpoint string, tolerance float64, averageOver int) *ProbeBot {
+func NewProbeBot(
+	eb *eventbus.EventBus,
+	interval int,
+	name, host, endpoint string,
+	sendUpdate func(service string, status status.HealthStatus),
+) *ProbeBot {
 	return &ProbeBot{
-		name:        name,
-		host:        host,
-		endpoint:    endpoint,
-		interval:    interval,
-		tolerance:   tolerance,
-		averageOver: averageOver,
+		name:       name,
+		host:       host,
+		endpoint:   endpoint,
+		interval:   interval,
+		sendUpdate: sendUpdate,
 
 		eb: eb,
 	}
@@ -40,44 +42,30 @@ func NewProbeBot(eb *eventbus.EventBus, interval int, name, host, endpoint strin
 func (p *ProbeBot) Start() {
 	ticker := time.NewTicker(time.Duration(p.interval) * time.Second)
 
-	total := float64(1)
-	failCount := float64(0)
-	alerted := false
-
-	p.eb.Subscribe("prober.probebot.cancel", func(data ...interface{}) {
+	p.eb.Subscribe(string(TerminateProbeBot), func(data ...interface{}) {
 		logrus.Info("received cancellation for", p.name)
 		ticker.Stop()
 	})
 
-	// First prbe should happen immediately
+	// First probe should happen immediately
 	logrus.Info("Probing ", p.host)
-	probeWrapper(p.name, p.host, p.endpoint)
+	p.SendUpdate(probe(p.host, p.endpoint))
 
 	for range ticker.C {
 		logrus.Info("Probing ", p.host)
-
-		total++
-		if !probeWrapper(p.name, p.host, p.endpoint) {
-			failCount++
-		}
-
-		if !alerted && total > float64(p.averageOver) && failCount/total > p.tolerance {
-			eventbus.Bus.Publish(PluginAlert, (failCount/total)*100, p.name)
-			alerted = true
-		}
+		p.SendUpdate(probe(p.host, p.endpoint))
 	}
 }
 
-func probeWrapper(name, host, endpoint string) bool {
-	topic := fmt.Sprintf("%s.%s", StatusUpdate, name)
-
-	if probe(host, endpoint) {
-		eventbus.Bus.Publish(topic, models.HealthOK)
-		return true
+// SendUpdate sends health update via the method
+// provided to it by the prober
+func (p *ProbeBot) SendUpdate(ok bool) {
+	if ok {
+		p.sendUpdate(p.name, status.HealthOK)
+		return
 	}
 
-	eventbus.Bus.Publish(topic, models.HealthFail)
-	return false
+	p.sendUpdate(p.name, status.HealthFail)
 }
 
 func probe(host, endpoint string) bool {

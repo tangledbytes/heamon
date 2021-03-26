@@ -8,7 +8,7 @@ import (
 
 // RegisterNewConfig updates the configuration
 func (h *Handler) RegisterNewConfig(c *fiber.Ctx) error {
-	if err := h.config.UpdateConfig(c.Body()); err != nil {
+	if err := h.config.Update(c.Body()); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(GenericMessageResponse{err.Error()})
 	}
 
@@ -17,5 +17,5 @@ func (h *Handler) RegisterNewConfig(c *fiber.Ctx) error {
 
 // GetConfig returns the current config
 func (h *Handler) GetConfig(c *fiber.Ctx) error {
-	return c.JSON(h.config)
+	return c.JSON(h.config.Copy())
 }

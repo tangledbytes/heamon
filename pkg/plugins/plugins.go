@@ -2,12 +2,12 @@ package plugins
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/utkarsh-pro/heamon/models"
 	"github.com/utkarsh-pro/heamon/pkg/eventbus"
-	"github.com/utkarsh-pro/heamon/plugins/alerts"
+	"github.com/utkarsh-pro/heamon/pkg/plugins/alerts"
+	"github.com/utkarsh-pro/heamon/pkg/store/config"
 )
 
-func Setup(cfg *models.Plugins) {
+func Setup(cfg *config.Plugins) {
 	if cfg.Alert.Email != nil {
 		mail := alerts.NewMail(
 			cfg.Alert.Email.SMTP.Host,
