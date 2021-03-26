@@ -12,21 +12,25 @@ import (
 )
 
 type ProbeBot struct {
-	name     string
-	host     string
-	endpoint string
-	interval int
+	name        string
+	host        string
+	endpoint    string
+	interval    int
+	tolerance   float64
+	averageOver int
 
 	eb *eventbus.EventBus
 }
 
 // NewProbeBot returns a pointer to an instance of ProbBot
-func NewProbeBot(eb *eventbus.EventBus, interval int, name, host, endpoint string) *ProbeBot {
+func NewProbeBot(eb *eventbus.EventBus, interval int, name, host, endpoint string, tolerance float64, averageOver int) *ProbeBot {
 	return &ProbeBot{
-		name:     name,
-		host:     host,
-		endpoint: endpoint,
-		interval: interval,
+		name:        name,
+		host:        host,
+		endpoint:    endpoint,
+		interval:    interval,
+		tolerance:   tolerance,
+		averageOver: averageOver,
 
 		eb: eb,
 	}
@@ -34,7 +38,11 @@ func NewProbeBot(eb *eventbus.EventBus, interval int, name, host, endpoint strin
 
 // Start the probbot
 func (p *ProbeBot) Start() {
-	ticker := time.NewTicker(time.Duration(p.interval) * time.Minute)
+	ticker := time.NewTicker(time.Duration(p.interval) * time.Second)
+
+	total := float64(1)
+	failCount := float64(0)
+	alerted := false
 
 	p.eb.Subscribe("prober.probebot.cancel", func(data ...interface{}) {
 		logrus.Info("received cancellation for", p.name)
@@ -47,18 +55,29 @@ func (p *ProbeBot) Start() {
 
 	for range ticker.C {
 		logrus.Info("Probing ", p.host)
-		probeWrapper(p.name, p.host, p.endpoint)
+
+		total++
+		if !probeWrapper(p.name, p.host, p.endpoint) {
+			failCount++
+		}
+
+		if !alerted && total > float64(p.averageOver) && failCount/total > p.tolerance {
+			eventbus.Bus.Publish(PluginAlert, (failCount/total)*100, p.name)
+			alerted = true
+		}
 	}
 }
 
-func probeWrapper(name, host, endpoint string) {
+func probeWrapper(name, host, endpoint string) bool {
 	topic := fmt.Sprintf("%s.%s", StatusUpdate, name)
 
 	if probe(host, endpoint) {
 		eventbus.Bus.Publish(topic, models.HealthOK)
-	} else {
-		eventbus.Bus.Publish(topic, models.HealthFail)
+		return true
 	}
+
+	eventbus.Bus.Publish(topic, models.HealthFail)
+	return false
 }
 
 func probe(host, endpoint string) bool {

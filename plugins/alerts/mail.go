@@ -1,6 +1,12 @@
 package alerts
 
-import "net/smtp"
+import (
+	"fmt"
+	"net/smtp"
+	"strings"
+
+	"github.com/sirupsen/logrus"
+)
 
 // Mail struct
 type Mail struct {
@@ -25,10 +31,26 @@ func NewMail(host, port, password, username, from string, to []string) *Mail {
 }
 
 // Send sends the content
-func (m *Mail) Send(content []byte) error {
+func (m *Mail) Send(subject, message string) error {
 	// Authentication
 	auth := smtp.PlainAuth("", m.Username, m.Password, m.Host)
 
+	content := fmt.Sprintf(`To: %s
+From: %s
+Subject: %s
+
+%s`, strings.Join(m.To, ","), m.From, subject, message)
 	// Sending Email
-	return smtp.SendMail(m.Host+":"+m.Port, auth, m.From, m.To, content)
+	return smtp.SendMail(m.Host+":"+m.Port, auth, m.From, m.To, []byte(content))
+}
+
+func (m *Mail) GetEvent() string {
+	return "heamon.plugin.alert"
+}
+
+func (m *Mail) EventCallback(fail float64, service string) {
+	logrus.Info("sending alert mail!")
+	if err := m.Send(service+" Alert!", fmt.Sprintf("%s has failed for over %f%% times!\n", service, fail)); err != nil {
+		logrus.Error(err)
+	}
 }

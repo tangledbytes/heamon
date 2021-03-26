@@ -3,10 +3,11 @@ package config
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/utkarsh-pro/heamon/models"
 )
 
 // Setup will setup the config reader
-func Setup() {
+func Setup() (cfg models.Config) {
 	// Set defaults
 	viper.SetDefault("HEAMON_USER", "admin")
 	viper.SetDefault("HEAMON_PASS", "pl,pl,")
@@ -29,4 +30,8 @@ func Setup() {
 			logrus.Fatal("failed to read config:", err)
 		}
 	}
+
+	viper.Unmarshal(&cfg)
+
+	return
 }

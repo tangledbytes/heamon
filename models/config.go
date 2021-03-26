@@ -6,38 +6,56 @@ import (
 )
 
 type Config struct {
-	Interval int       `json:"interval,omitempty"`
-	Services []Service `json:"services,omitempty"`
+	Title          string         `json:"title,omitempty"`
+	Port           string         `json:"port,omitempty"`
+	Authentication Authentication `json:"authentication,omitempty"`
+
+	Monitor Monitor  `json:"monitor,omitempty"`
+	Plugins *Plugins `json:"plugins,omitempty"`
+}
+
+type Authentication struct {
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+}
+
+type Plugins struct {
+	Alert *PluginsAlerts `json:"alert,omitempty"`
+}
+
+type PluginsAlerts struct {
+	Email *AlertEmail `json:"email,omitempty"`
+}
+
+type AlertEmail struct {
+	SMTP AlertEmailSMTP `json:"smtp,omitempty"`
+	From string         `json:"from,omitempty"`
+	To   []string       `json:"to,omitempty"`
+}
+
+type AlertEmailSMTP struct {
+	Host     string `json:"host,omitempty"`
+	Port     string `json:"port,omitempty"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+}
+
+type Monitor struct {
+	Interval    int       `json:"interval,omitempty"`
+	AverageOver int       `json:"average_over,omitempty"`
+	Services    []Service `json:"services,omitempty"`
 }
 
 type Service struct {
-	Name                string `json:"name,omitempty"`
-	Host                string `json:"host,omitempty"`
-	HealthCheckEndpoint string `json:"health_check_endpoint,omitempty"`
-}
-
-func (cfg *Config) GetConfig() Config {
-	return *cfg
+	Name                string  `json:"name,omitempty"`
+	Host                string  `json:"host,omitempty"`
+	Interval            int     `json:"interval,omitempty"`
+	HealthCheckEndpoint string  `json:"health_check_endpoint,omitempty"`
+	Tolerance           float64 `json:"tolerance,omitempty"`
 }
 
 // IsValid returns an error if the configuration is invalid
 func (cfg *Config) IsValid() error {
-	// Check if the interval is greater than 0
-	if cfg.Interval < 1 {
-		return fmt.Errorf("interval cannot be less than 1 minute")
-	}
-
-	// Check for duplicate names
-	names := map[string]struct{}{}
-	for _, svc := range cfg.Services {
-		_, ok := names[svc.Name]
-		if ok {
-			return fmt.Errorf("duplicate entries found for %s service", svc.Name)
-		}
-
-		names[svc.Name] = struct{}{}
-	}
-
 	return nil
 }
 

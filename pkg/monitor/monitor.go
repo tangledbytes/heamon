@@ -31,7 +31,7 @@ func (m *Monitor) SetupSubscribers() {
 // New returns a pointer to an instance of the monitor
 func New(config models.Config) *Monitor {
 	st := &Status{
-		Status:        models.NewStatus(config.Services),
+		Status:        models.NewStatus(config.Monitor.Services),
 		subscriberIds: map[string]int64{},
 	}
 	cfg := &Config{Config: &config}
@@ -58,7 +58,7 @@ func (m *Monitor) setupConfigUpdateSubscribers() {
 			m.Prober.Terminate()
 
 			// Refresh status
-			m.Status.Refresh(m.Config.Services)
+			m.Status.Refresh(m.Config.Monitor.Services)
 
 			// Setup subscribers again
 			m.setupStatusUpdateSubscribers()
@@ -91,4 +91,9 @@ func (m *Monitor) setupStatusUpdateSubscribers() {
 			m.Status.UpdateStatus(name, stat)
 		})
 	}
+}
+
+// Stop stops the monitoring
+func (m *Monitor) Stop() {
+	m.Prober.Terminate()
 }

@@ -12,9 +12,9 @@ import (
 	"github.com/spf13/viper"
 	"github.com/utkarsh-pro/heamon/handlers"
 	"github.com/utkarsh-pro/heamon/middlewares"
-	"github.com/utkarsh-pro/heamon/models"
 	"github.com/utkarsh-pro/heamon/pkg/config"
 	"github.com/utkarsh-pro/heamon/pkg/monitor"
+	"github.com/utkarsh-pro/heamon/plugins"
 	"github.com/utkarsh-pro/heamon/routes"
 )
 
@@ -28,7 +28,10 @@ var (
 func main() {
 	printInfo(version, commit, date)
 
-	config.Setup()
+	cfg := config.Setup()
+
+	// Plugins setup
+	plugins.Setup(cfg.Plugins.Alert)
 
 	// Setup the rendering engine as there are some overrides
 	// that heamon offers react based frontend
@@ -42,7 +45,7 @@ func main() {
 	middlewares.Setup(app)
 
 	// Setup monitoring on top of the http endpoints
-	mon := monitor.New(models.Config{Interval: 1})
+	mon := monitor.New(cfg)
 	handlers := handlers.NewHandlers(mon.Config, mon.Status)
 
 	routes.NewRoutes(app, handlers)
@@ -56,15 +59,16 @@ func main() {
 	fmt.Println("🚀 Heamon started on PORT: ", viper.GetString("PORT"))
 
 	// Handle graceful shutdown
-	gracefulShutdown(app)
+	gracefulShutdown(app, mon.Stop)
 }
 
-func gracefulShutdown(app *fiber.App) {
+func gracefulShutdown(app *fiber.App, cleanup func()) {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 
 	<-c
 	logrus.Info("Shutting down Heamon 👋")
+	cleanup()
 
 	if err := app.Shutdown(); err != nil {
 		logrus.Error("error occured while shutting down the Heamon:", err)

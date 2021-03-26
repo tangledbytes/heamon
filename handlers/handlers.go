@@ -10,7 +10,6 @@ type Status interface {
 }
 
 type Config interface {
-	GetConfig() models.Config
 	UpdateConfig([]byte) error
 }
 
