@@ -40,7 +40,7 @@ func NewProbeBot(
 
 // Start the probbot
 func (p *ProbeBot) Start() {
-	ticker := time.NewTicker(time.Duration(p.interval) * time.Second)
+	ticker := time.NewTicker(time.Duration(p.interval) * time.Minute)
 
 	p.eb.Subscribe(string(TerminateProbeBot), func(data ...interface{}) {
 		logrus.Info("received cancellation for", p.name)
