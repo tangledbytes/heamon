@@ -29,5 +29,6 @@ func apiV1Routes(app *fiber.App, handlers *handlers.Handler) {
 
 	api.Put("config", handlers.RegisterNewConfig)
 	api.Get("config", handlers.GetConfig)
+	api.Patch("config", handlers.PatchConfig)
 	api.Get("status", handlers.GetStatus)
 }

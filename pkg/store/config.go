@@ -13,4 +13,5 @@ type Config interface {
 	Update([]byte) error
 	Hook() *config.Hook
 	Watch(config.Event, config.WatchCallback) *config.Watcher
+	Merge([]byte) error
 }
