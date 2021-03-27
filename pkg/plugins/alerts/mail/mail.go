@@ -50,15 +50,15 @@ func (m *Mail) Start() {
 			if m.alertedOn == nil ||
 				(m.alertedOn.Add(time.Duration(m.Duration)*time.Minute).Sub(t) <= 0) {
 				logrus.Info("[MAIL PLUGIN]: Sending Alert")
-				// m.Send(
-				// 	fmt.Sprintf("Service %s is failing", sh.Name),
-				// 	fmt.Sprintf(
-				// 		`Service %s with host name %s and health check endpoint %s is failing`,
-				// 		sh.Name,
-				// 		sh.Host,
-				// 		sh.HealthCheckEndpoint,
-				// 	),
-				// )
+				m.Send(
+					fmt.Sprintf("Service %s is failing", sh.Name),
+					fmt.Sprintf(
+						`Service %s with host name %s and health check endpoint %s is failing`,
+						sh.Name,
+						sh.Host,
+						sh.HealthCheckEndpoint,
+					),
+				)
 				m.alertedOn = &t
 			}
 		}
