@@ -53,17 +53,18 @@ type AlertEmailSMTP struct {
 }
 
 type Monitor struct {
-	Interval    int       `json:"interval,omitempty"`
-	AverageOver int       `json:"average_over,omitempty"`
-	Services    []Service `json:"services,omitempty"`
+	Interval float64   `json:"interval,omitempty"`
+	Services []Service `json:"services,omitempty"`
 }
 
 type Service struct {
 	Name                string  `json:"name,omitempty"`
 	Host                string  `json:"host,omitempty"`
-	Interval            int     `json:"interval,omitempty"`
+	Interval            float64 `json:"interval,omitempty"`
 	HealthCheckEndpoint string  `json:"health_check_endpoint,omitempty"`
-	Tolerance           float64 `json:"tolerance,omitempty"`
+	Failure             float64 `json:"failure,omitempty"`
+	Degraded            float64 `json:"degraded,omitempty"`
+	InitialDownTime     float64 `json:"initial_down_time,omitempty"`
 }
 
 // New returns a pointer to an instance

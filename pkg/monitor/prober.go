@@ -29,12 +29,13 @@ func (p *Prober) Start() {
 
 	for _, svc := range cfg.Monitor.Services {
 		// Create new Probe Bot and start it
+		if svc.Interval == 0 {
+			svc.Interval = cfg.Monitor.Interval
+		}
+
 		go NewProbeBot(
 			p.eb,
-			cfg.Monitor.Interval,
-			svc.Name,
-			svc.Host,
-			svc.HealthCheckEndpoint,
+			svc,
 			p.status.Update,
 		).Start()
 	}

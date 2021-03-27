@@ -4,8 +4,8 @@ package status
 type HealthStatus string
 
 const (
-	HealthUnknown      HealthStatus = "UNKNOWN"
-	HealthOK           HealthStatus = "OK"
-	HealthFail         HealthStatus = "FAIL"
-	Healthdeteriorated HealthStatus = "DETERIORATED"
+	HealthUnknown  HealthStatus = "UNKNOWN"
+	HealthOK       HealthStatus = "OK"
+	HealthFail     HealthStatus = "FAIL"
+	HealthDegraded HealthStatus = "DEGRADED"
 )
