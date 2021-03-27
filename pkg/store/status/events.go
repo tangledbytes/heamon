@@ -14,7 +14,7 @@ const (
 
 // WatchCallback is the type for callback functions
 // that Watch method of Struct struct can consume
-type WatchCallback func(HealthStatus)
+type WatchCallback func(ServiceHealth)
 
 // Watcher struct manages something -_-
 type Watcher struct {

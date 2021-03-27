@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/sirupsen/logrus"
 	"github.com/utkarsh-pro/heamon/pkg/eventbus"
 	"github.com/utkarsh-pro/heamon/pkg/hook"
 )
@@ -37,9 +38,10 @@ type PluginsAlerts struct {
 }
 
 type AlertEmail struct {
-	SMTP AlertEmailSMTP `json:"smtp,omitempty"`
-	From string         `json:"from,omitempty"`
-	To   []string       `json:"to,omitempty"`
+	SMTP     AlertEmailSMTP `json:"smtp,omitempty"`
+	From     string         `json:"from,omitempty"`
+	To       []string       `json:"to,omitempty"`
+	Duration float64        `json:"duration,omitempty"`
 }
 
 type AlertEmailSMTP struct {
@@ -89,6 +91,7 @@ func (cfg *Config) Update(configbyt []byte) error {
 
 	var tempCfg Config
 	if err := json.Unmarshal(configbyt, &tempCfg); err != nil {
+		logrus.Error("[Config Update]:", err)
 		return fmt.Errorf("invalid format of the configuration")
 	}
 
@@ -97,6 +100,7 @@ func (cfg *Config) Update(configbyt []byte) error {
 	}
 
 	if err := json.Unmarshal(configbyt, cfg); err != nil {
+		logrus.Error("[Config Update]:", err)
 		return fmt.Errorf("invalid format of the configuration")
 	}
 
@@ -105,7 +109,7 @@ func (cfg *Config) Update(configbyt []byte) error {
 
 	// Fire the event THIS SHOULD HAPPEN ONLY
 	// ONCE ALL OF THE HOOKS ARE COMPLETED
-	cfg.eb.Publish(string(UPDATE))
+	cfg.eb.Publish(string(UPDATE), &tempCfg)
 
 	return nil
 }
@@ -144,7 +148,18 @@ func (cfg *Config) Copy() *Config {
 
 func (cfg *Config) Watch(ev Event, cb WatchCallback) *Watcher {
 	id := cfg.eb.Subscribe(string(ev), func(data ...interface{}) {
-		cb()
+		if len(data) != 1 {
+			logrus.Errorf("malformed data received for event %s", ev)
+			return
+		}
+
+		cfg, ok := data[0].(*Config)
+		if !ok {
+			logrus.Errorf("malformed data received for event %s, expected *Config", ev)
+			return
+		}
+
+		cb(cfg)
 	})
 
 	return &Watcher{

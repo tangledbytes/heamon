@@ -16,28 +16,25 @@ type Monitor struct {
 }
 
 // New returns a pointer to an instance of the monitor
-func New(storeManager *store.Manager) *Monitor {
-	st := storeManager.Status()
-	cfg := storeManager.Config()
-
-	prober := NewProber(cfg, st)
+func New(Config store.Config, Status store.Status) *Monitor {
+	prober := NewProber(Config, Status)
 	prober.Start()
 
 	mon := &Monitor{
-		Status: st,
-		Config: cfg,
+		Status: Status,
+		Config: Config,
 		Prober: prober,
 	}
 
-	mon.SetupSubscribers()
+	mon.setupConfigWatcher()
 
 	return mon
 }
 
-// SetupSubscribers sets up all of the
+// setupConfigWatcher sets up all of the
 // initial subscribers
-func (m *Monitor) SetupSubscribers() {
-	m.Config.Watch(config.UPDATE, func() {
+func (m *Monitor) setupConfigWatcher() {
+	m.Config.Watch(config.UPDATE, func(*config.Config) {
 		if m.Prober != nil {
 			// Terminate old prober
 			m.Prober.Terminate()

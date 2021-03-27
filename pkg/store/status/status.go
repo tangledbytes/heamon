@@ -66,6 +66,18 @@ func (st *Status) Refresh(svcs []config.Service) {
 	}
 }
 
+// Of method returns ServiceHealth of the service name
+// given in the parameter
+func (st *Status) Of(service string) ServiceHealth {
+	for _, svc := range st.Report {
+		if svc.Name == service {
+			return svc
+		}
+	}
+
+	return ServiceHealth{}
+}
+
 // Copy returns the value of the current status object
 func (st *Status) Copy() *Status {
 	st.mu.Lock()
@@ -86,13 +98,13 @@ func (st *Status) Watch(ev Event, cb WatchCallback) *Watcher {
 			return
 		}
 
-		hs, ok := data[0].(HealthStatus)
+		svc, ok := data[0].(ServiceHealth)
 		if !ok {
-			logrus.Errorf("malformed data received for event %s", ev)
+			logrus.Errorf("malformed data received for event %s, expected ServiceHealth", ev)
 			return
 		}
 
-		cb(hs)
+		cb(svc)
 	})
 
 	return &Watcher{

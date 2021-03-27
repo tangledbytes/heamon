@@ -13,7 +13,7 @@ func Setup(app *fiber.App) {
 	app.Use(logger.New())
 	app.Use(recover.New())
 	app.Use(CustomBasicAuth(CustomBasicAuthConfig{
-		Routes: Routes{"/api/v1/config/monitor", "/api/v1/config"},
+		Routes: Routes{"/api/v1/config"},
 		Config: basicauth.Config{
 			Users: map[string]string{
 				viper.GetString("HEAMON_USER"): viper.GetString("HEAMON_PASS"),

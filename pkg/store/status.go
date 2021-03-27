@@ -13,4 +13,5 @@ type Status interface {
 	Refresh(svcs []config.Service)
 	Copy() *status.Status
 	Watch(status.Event, status.WatchCallback) *status.Watcher
+	Of(service string) status.ServiceHealth
 }

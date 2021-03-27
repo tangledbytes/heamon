@@ -16,6 +16,7 @@ import (
 	"github.com/utkarsh-pro/heamon/pkg/entrypoint/rest/middlewares"
 	"github.com/utkarsh-pro/heamon/pkg/entrypoint/rest/routes"
 	"github.com/utkarsh-pro/heamon/pkg/monitor"
+	"github.com/utkarsh-pro/heamon/pkg/plugins"
 	"github.com/utkarsh-pro/heamon/pkg/store"
 )
 
@@ -26,7 +27,9 @@ func Run() error {
 	manager := store.NewManager()
 	manager.InitializeStore()
 
-	mon := monitor.New(manager)
+	mon := monitor.New(manager.Config(), manager.Status())
+
+	plugins.Setup(manager.Config(), manager.Status())
 
 	fsystem := getFileSystem()
 	engine := html.NewFileSystem(fsystem, ".html")

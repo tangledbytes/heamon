@@ -27,7 +27,7 @@ func NewRoutes(app *fiber.App, handlers *handlers.Handler, fsystem http.FileSyst
 func apiV1Routes(app *fiber.App, handlers *handlers.Handler) {
 	api := app.Group("/api/v1")
 
-	api.Put("config/monitor", handlers.RegisterNewConfig)
+	api.Put("config", handlers.RegisterNewConfig)
 	api.Get("config", handlers.GetConfig)
 	api.Get("status", handlers.GetStatus)
 }
