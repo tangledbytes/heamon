@@ -27,7 +27,7 @@ type Config struct {
 }
 
 type Authentication struct {
-	Username string `json:"username,omitempty" validate:"required,min=8"`
+	Username string `json:"username,omitempty" validate:"required,min=5"`
 	Password string `json:"password,omitempty" validate:"required,min=8"`
 }
 

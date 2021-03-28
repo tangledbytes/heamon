@@ -10,15 +10,17 @@ import (
 
 // initConfig will setup the config reader
 func initConfig(cfg Config) {
+	// Register alias to support mapping of env with config
+	viper.RegisterAlias("HEAMON_USER", "authentication.username")
+	viper.RegisterAlias("HEAMON_PASS", "authentication.password")
+	viper.RegisterAlias("HEAMON_INTERVAL", "monitor.interval")
+
 	// Set defaults
 	viper.SetDefault("TITLE", "Heamon")
 	viper.SetDefault("PORT", "5000")
 	viper.SetDefault("HEAMON_USER", "admin")
-	viper.SetDefault("HEAMON_PASS", "pl,pl,")
-
-	// Register alias to support mapping of env with config
-	viper.RegisterAlias("HEAMON_USER", "authentication.username")
-	viper.RegisterAlias("HEAMON_PASS", "authentication.password")
+	viper.SetDefault("HEAMON_PASS", "password")
+	viper.SetDefault("HEAMON_INTERVAL", "60")
 
 	viper.AutomaticEnv()
 
