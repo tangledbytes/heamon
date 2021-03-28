@@ -1,6 +1,9 @@
 package store
 
 import (
+	"os"
+	"strings"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -30,5 +33,25 @@ func initConfig(cfg Config) {
 		}
 	}
 
+	replacePlaceholders()
+
 	viper.Unmarshal(&cfg)
+}
+
+func replacePlaceholders() {
+	for _, k := range viper.AllKeys() {
+		value := viper.GetString(k)
+		if strings.HasPrefix(value, "${{.") && strings.HasSuffix(value, "}}") {
+			viper.Set(k, getEnv(strings.TrimSuffix(strings.TrimPrefix(value, "${{."), "}}")))
+		}
+	}
+}
+
+func getEnv(key string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		logrus.Warnf("environmental variable %s is \"\"", key)
+	}
+
+	return val
 }

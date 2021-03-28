@@ -6,3 +6,4 @@ heamon
 config.yaml
 dist/
 pkg/entrypoint/rest/ui
+config.bak.yaml

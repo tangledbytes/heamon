@@ -1,0 +1,39 @@
+title: Heamon Hackstrap # Title will be used on the Heamon UI
+port: 3000 # Heamon will start on this port
+authentication:
+  username: ${{.HEAMON_USER}} # Will be replaced with env var $HEAMON_USER
+  password: ${{.HEAMON_PASS}} # Will be replaced with env var $HEAMON_PASS
+monitor:
+  interval: 5 # Interval in minutes at which heamon probe-bots will query the service
+  services:
+    - name: Service 1 # Name of the service
+      host: <service-host> # Host name, for Sagacious it will be sagacious.dev
+      health_check_endpoint: / # The endpoint which will be queried for health check
+      failure: 90 # Service state will be marked as "FAIL" if more than 90% requests fails
+      degraded: 80 # Service state will be marked as "DEGRADED" if more than 80% requests fail
+      initial_down_time: 5 # Expected initial down time for the service. The service will be marked in unknown state for this duration
+    - name: Sagacious
+      host: sagacious.dev
+      health_check_endpoint: /
+      failure: 90
+      degraded: 80
+      initial_down_time: 5
+    # Any number of services can be placed here...
+
+# Plugins are optional features of heamon and can be turned off by removing them from the
+# the config file
+plugins:
+  alert:
+    email:
+      smtp:
+        host: smtp.sendgrid.net
+        port: 25
+        username: ${{.SENDGRID_USERNAME}}
+        password: ${{.SENDGRID_API}}
+      from: <alert@sagacious.dev>
+      to:
+        - utkarsh@sagacious.dev
+        - example@example.com
+      duration: 60 # Duration to wait before triggering another mail. This will not be respected if the application
+                   # state changes
+      

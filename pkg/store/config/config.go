@@ -20,9 +20,9 @@ type Config struct {
 	Monitor Monitor  `json:"monitor,omitempty"`
 	Plugins *Plugins `json:"plugins,omitempty"`
 
-	hook *Hook `json:"-"`
-	mu   sync.Mutex
-	eb   *eventbus.EventBus
+	hook *Hook              `json:"-"`
+	mu   sync.Mutex         `json:"-"`
+	eb   *eventbus.EventBus `json:"-"`
 }
 
 type Authentication struct {
