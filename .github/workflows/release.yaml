@@ -20,7 +20,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DH_USERNAME }}
-          password: ${{ secrets.Dh_PAT }}
+          password: ${{ secrets.DH_PAT }}
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
