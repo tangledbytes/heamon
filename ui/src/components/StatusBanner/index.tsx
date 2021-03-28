@@ -1,54 +1,56 @@
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import Icon from "../StatusCard/Icon";
-import { Status, COLORGREEN, COLORRED } from "../../global/constants";
+import { Status, COLORGREEN, COLORRED, COLORYELLOW, COLORGRAY } from "../../global/constants";
 
-function Content({ isFunctional = true }: { isFunctional?: boolean }) {
-  if (isFunctional) {
-    return (
-      <>
-        <Icon
-          status={Status.OK}
-          style={{ marginRight: "1rem", color: "#fff" }}
-        />
-        <Typography style={{ color: "#fff" }} variant="h6" component="div">
-          All Systems Operational
-        </Typography>
-      </>
-    );
+function colorForStatus(status : Status): string {
+  if (status === Status.OK) return COLORGREEN;
+  if (status === Status.FAIL) return COLORRED;
+  if (status === Status.DEGRADED) return COLORYELLOW;
+
+  return COLORGRAY
+}
+
+function Content({ status = Status.UNKNOWN }: { status?: Status }) {
+  let content: Record<Status, string> = {
+    OK: "All Systems Operational",
+    FAIL: "Some Systems are Failing!",
+    DEGRADED: "Some Systems are in Degraded State",
+    UNKNOWN: "All Systems Operational"
   }
 
   return (
     <>
       <Icon
-        status={Status.FAIL}
+        status={status}
         style={{ marginRight: "1rem", color: "#fff" }}
       />
       <Typography style={{ color: "#fff" }} variant="h6" component="div">
-        Some Systems are Failing!
+        {content[status]}
       </Typography>
     </>
   );
 }
 
 function StatusBanner({
-  isFunctional = true,
+  status = Status.UNKNOWN,
   style = {},
 }: {
-  isFunctional?: boolean;
+  status?: Status;
   style?: React.CSSProperties;
 }) {
+
   return (
     <Paper
       elevation={3}
       style={{
-        backgroundColor: isFunctional ? COLORGREEN : COLORRED,
+        backgroundColor: colorForStatus(status),
         padding: "1rem",
         ...style
       }}
     >
       <div style={{ display: "flex", alignItems: "center" }}>
-        <Content isFunctional={isFunctional} />
+        <Content status={status} />
       </div>
     </Paper>
   );

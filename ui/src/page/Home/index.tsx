@@ -2,6 +2,7 @@ import Typography from "@material-ui/core/Typography";
 import { useEffect, useState } from "react";
 import StatusCardGrid from "../../components/StatusGrid";
 import StatusBanner from "../../components/StatusBanner";
+import { Status } from "../../global/constants";
 
 async function GetStatus() {
   try {
@@ -15,14 +16,18 @@ async function GetStatus() {
   }
 }
 
-function allFunctional(data: Array<any>): boolean {
-  if (!Array.isArray(data)) return true;
+function constructStatus(data: Array<any>): Status {
+  if (!Array.isArray(data)) return Status.UNKNOWN;
 
   for (const el of data) {
-    if (el.status !== "OK") return false;
+    if (el.status === "FAIL") return Status.FAIL;
   }
 
-  return true;
+  for (const el of data) {
+    if (el.status === "DEGRADED") return Status.DEGRADED;
+  }
+
+  return Status.OK
 }
 
 function Home() {
@@ -39,11 +44,9 @@ function Home() {
     });
   }, []);
 
-  const isFunctional = allFunctional(data);
-
   return (
     <main>
-      <StatusBanner isFunctional={isFunctional} style={{ marginBottom: "1rem" }} />
+      <StatusBanner status={constructStatus(data)} style={{ marginBottom: "1rem" }} />
       <Typography variant="h4" align="center" gutterBottom>
         Current Status
       </Typography>
