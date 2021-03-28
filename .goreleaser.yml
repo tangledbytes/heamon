@@ -25,9 +25,9 @@ dockers:
     ids:
       - heamon
     image_templates:
-    - "utkarsh-pro/heamon:latest"
-    - "utkarsh-pro/heamon:{{ .Tag }}"
-    - "utkarsh-pro/heamon:v{{ .Major }}"
+    - "utkarsh23/heamon:latest"
+    - "utkarsh23/heamon:{{ .Tag }}"
+    - "utkarsh23/heamon:v{{ .Major }}"
     dockerfile: Dockerfile
 checksum:
   name_template: 'checksums.txt'
