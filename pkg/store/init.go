@@ -1,7 +1,6 @@
 package store
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -38,8 +37,6 @@ func initConfig(cfg Config) {
 	replacePlaceholders()
 
 	viper.Unmarshal(&cfg)
-
-	fmt.Printf("%+v\n", cfg)
 }
 
 func replacePlaceholders() {
