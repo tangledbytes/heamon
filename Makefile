@@ -2,7 +2,7 @@ GIT_VERSION=$(shell git describe --tags `git rev-list --tags --max-count=1`)
 GIT_COMMITSHA=$(shell git rev-list -1 HEAD)
 
 run-local:
-	PORT=5000 go run ./cmd/rest/main.go;
+	go run ./cmd/rest/main.go;
 
 run-ui:
 	cd ui && npm start

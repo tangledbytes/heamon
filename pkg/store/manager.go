@@ -1,6 +1,7 @@
 package store
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/utkarsh-pro/heamon/pkg/store/config"
 	"github.com/utkarsh-pro/heamon/pkg/store/status"
 )
@@ -29,6 +30,10 @@ func (m *Manager) InitializeStore() {
 	})
 
 	initConfig(cfg)
+
+	if err := cfg.Validate(); err != nil {
+		logrus.Fatal("config validation failed:\n", err)
+	}
 
 	m.config = cfg
 	m.status = status.New(cfg.Monitor.Services)

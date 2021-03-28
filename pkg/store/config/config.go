@@ -6,18 +6,19 @@ import (
 	"sync"
 
 	jsonpatch "github.com/evanphx/json-patch/v5"
+	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 	"github.com/utkarsh-pro/heamon/pkg/eventbus"
 	"github.com/utkarsh-pro/heamon/pkg/hook"
 )
 
-// Config stores the configuration
+// Config stores the configuration300000
 type Config struct {
-	Title          string         `json:"title,omitempty"`
-	Port           string         `json:"port,omitempty"`
-	Authentication Authentication `json:"authentication,omitempty"`
+	Title          string         `json:"title,omitempty" validate:"required"`
+	Port           string         `json:"port,omitempty" validate:"required,number"`
+	Authentication Authentication `json:"authentication,omitempty" validate:"required"`
 
-	Monitor Monitor  `json:"monitor,omitempty"`
+	Monitor Monitor  `json:"monitor,omitempty" validate:"required"`
 	Plugins *Plugins `json:"plugins,omitempty"`
 
 	hook *Hook              `json:"-"`
@@ -26,45 +27,45 @@ type Config struct {
 }
 
 type Authentication struct {
-	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
+	Username string `json:"username,omitempty" validate:"required,min=8"`
+	Password string `json:"password,omitempty" validate:"required,min=8"`
 }
 
 type Plugins struct {
-	Alert *PluginsAlerts `json:"alert,omitempty"`
+	Alert *PluginsAlerts `json:"alert,omitempty" validate:"dive"`
 }
 
 type PluginsAlerts struct {
-	Email *AlertEmail `json:"email,omitempty"`
+	Email *AlertEmail `json:"email,omitempty" validate:"dive"`
 }
 
 type AlertEmail struct {
-	SMTP     AlertEmailSMTP `json:"smtp,omitempty"`
-	From     string         `json:"from,omitempty"`
-	To       []string       `json:"to,omitempty"`
-	Duration float64        `json:"duration,omitempty"`
+	SMTP     AlertEmailSMTP `json:"smtp,omitempty" validate:"required,dive"`
+	From     string         `json:"from,omitempty" validate:"required,startswith=<,endswith=>"`
+	To       []string       `json:"to,omitempty" validate:"required,dive,email"`
+	Duration float64        `json:"duration,omitempty" validate:"gte=0"`
 }
 
 type AlertEmailSMTP struct {
-	Host     string `json:"host,omitempty"`
-	Port     string `json:"port,omitempty"`
-	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
+	Host     string `json:"host,omitempty" validate:"required"`
+	Port     string `json:"port,omitempty" validate:"required"`
+	Username string `json:"username,omitempty" validate:"required"`
+	Password string `json:"password,omitempty" validate:"required"`
 }
 
 type Monitor struct {
-	Interval float64   `json:"interval,omitempty"`
-	Services []Service `json:"services,omitempty"`
+	Interval float64   `json:"interval,omitempty" validate:"gte=1"`
+	Services []Service `json:"services,omitempty" validate:"unique=Name,dive"`
 }
 
 type Service struct {
-	Name                string  `json:"name,omitempty"`
-	Host                string  `json:"host,omitempty"`
-	Interval            float64 `json:"interval,omitempty"`
+	Name                string  `json:"name,omitempty" validate:"required"`
+	Host                string  `json:"host,omitempty" validate:"required,hostname|hostname_port"`
+	Interval            float64 `json:"interval,omitempty" validate:"-"`
 	HealthCheckEndpoint string  `json:"health_check_endpoint,omitempty"`
-	Failure             float64 `json:"failure,omitempty"`
-	Degraded            float64 `json:"degraded,omitempty"`
-	InitialDownTime     float64 `json:"initial_down_time,omitempty"`
+	Failure             float64 `json:"failure,omitempty" validate:"gte=0,lte=100"`
+	Degraded            float64 `json:"degraded,omitempty" validate:"gte=0,lte=100"`
+	InitialDownTime     float64 `json:"initial_down_time,omitempty" validate:"gte=0"`
 }
 
 // New returns a pointer to an instance
@@ -83,7 +84,9 @@ func New() *Config {
 
 // Validate returns an error if the configuration is invalid
 func (cfg *Config) Validate() error {
-	return nil
+	validate := validator.New()
+
+	return validate.Struct(cfg)
 }
 
 // Merge takes in patch config bytes and updates the config accordingly

@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -11,9 +12,10 @@ import (
 // initConfig will setup the config reader
 func initConfig(cfg Config) {
 	// Set defaults
+	viper.SetDefault("TITLE", "Heamon")
+	viper.SetDefault("PORT", "5000")
 	viper.SetDefault("HEAMON_USER", "admin")
 	viper.SetDefault("HEAMON_PASS", "pl,pl,")
-	viper.SetDefault("PORT", "5000")
 
 	// Register alias to support mapping of env with config
 	viper.RegisterAlias("HEAMON_USER", "authentication.username")
@@ -36,6 +38,8 @@ func initConfig(cfg Config) {
 	replacePlaceholders()
 
 	viper.Unmarshal(&cfg)
+
+	fmt.Printf("%+v\n", cfg)
 }
 
 func replacePlaceholders() {
