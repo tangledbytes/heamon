@@ -13,7 +13,7 @@ build-server:
 	go build -ldflags="-w -s -X main.version=${GIT_VERSION} -X main.commit=${GIT_COMMITSHA}" -a -o heamon ./cmd/rest/main.go
 
 build-ui:
-	cd ui && npm run build && rm -rf ../pkg/entrypoint/rest/ui && mv build ../pkg/entrypoint/rest/ui
+	cd ui && npm ci && npm run build && rm -rf ../pkg/entrypoint/rest/ui && mv build ../pkg/entrypoint/rest/ui
 
 setup-ui:
 	cd ui && npm i
