@@ -11,9 +11,9 @@ export interface StatusCardProps {
 
 function StatusCard({ name, status }: StatusCardProps) {
   return (
-    <Card>
+    <Card style={{ height: "100%" }}>
       <CardContent>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }} >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "100%" }} >
             <Typography variant="h6" component="div">{name}</Typography>
             <div style={{ margin: "0 0 0 auto", display: "flex" }}>
                 <Icon status={status}/>
