@@ -7,7 +7,7 @@
 
 <div style="display:flex;margin: 2rem 0">
     <div style="max-width:40%">
-        <image src="./docs/images/heamon_ui.png">
+        <img src="./docs/images/heamon_ui.png">
     </div>
     <div style="padding:0 1rem;">
         <div>Heamon is minimal monitoring system written in Go.</div>
