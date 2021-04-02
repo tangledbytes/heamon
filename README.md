@@ -5,22 +5,18 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/utkarsh-pro/heamon)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/utkarsh-pro/heamon)
 
-<div style="display:flex;margin: 2rem 0">
-    <div style="max-width:40%">
-        <img src="./docs/images/heamon_ui.png">
-    </div>
-    <div style="padding:0 1rem;">
-        <div>Heamon is minimal monitoring system written in Go.</div>
-        <ol>
-            <li>Hot Configuration Reloading</li>
-            <li>Configurable Email alerts on service degradation/failure</li>
-            <li>Minimal UI</li>
-        </ol>
-        <div>
-            Heamon has an extensible event driven architecture which allows writing plugins for it extremely easy. Email Notifications is implemented leveraging the events generated within Heamon.
-        </div>
-    </div>
-</div>
+![Heamon UI](./docs/images/heamon_ui.png)
+
+## What is Heamon?
+
+Heamon is minimal monitoring system written in Go. 
+
+Some of the features of Heamon:
+- Hot Configuration Reloading
+- Configurable Email alerts on service degradation/failure
+- Minimal UI
+
+*Heamon has an extensible event driven architecture which allows writing plugins for it extremely easy. Email Notifications is implemented leveraging the events generated within Heamon.*
 
 ## Sample Heamon Configuration
 
