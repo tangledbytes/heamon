@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
@@ -36,6 +37,7 @@ func Run() error {
 	app := fiber.New(fiber.Config{
 		Views:                 engine,
 		DisableStartupMessage: true,
+		ReadTimeout:           30 * time.Second,
 	})
 
 	middlewares.Setup(app)
@@ -71,6 +73,7 @@ func gracefulShutdown(app *fiber.App, cleanup func()) {
 
 	<-c
 	logrus.Info("Shutting down Heamon 👋")
+
 	cleanup()
 
 	if err := app.Shutdown(); err != nil {
